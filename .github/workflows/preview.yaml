@@ -1,0 +1,44 @@
+name: "Preview Deployment"
+on:
+  pull_request:
+    branches:
+      - main
+    types: [labeled]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ./package.json
+      - name: Enable Corepack
+        id: enable-corepack
+        run: corepack enable
+      - name: Install Dependencies
+        id: install
+        run: pnpm install
+      - name: Build
+        id: build
+        run: pnpm build
+      - name: Setup Sparkflare
+        id: setup-sparkflare
+        run: pnpm sparkflare environment:pull && pnpm sparkflare environment:switch -e preview
+        env:
+          SPARKFLARE_CLOUDFLARE_TOKEN: ${{ secrets.SPARKFLARE_CLOUDFLARE_TOKEN }}
+          SPARKFLARE_CLOUDFLARE_ACCOUNT_IDENTIFIER: ${{ secrets.SPARKFLARE_CLOUDFLARE_ACCOUNT_IDENTIFIER }}
+          SPARKFLARE_CLOUDFLARE_PROJECT_NAME: ${{ secrets.SPARKFLARE_CLOUDFLARE_PROJECT_NAME }}
+          SPARKFLARE_PACKAGE_MANAGER: pnpm
+      - name: Deploy with Sparkflare
+        id: deploy-sparkflare
+        run: pnpm sparkflare deploy -y -e preview
+        env:
+          SPARKFLARE_CLOUDFLARE_TOKEN: ${{ secrets.SPARKFLARE_CLOUDFLARE_TOKEN }}
+          SPARKFLARE_CLOUDFLARE_ACCOUNT_IDENTIFIER: ${{ secrets.SPARKFLARE_CLOUDFLARE_ACCOUNT_IDENTIFIER }}
+          SPARKFLARE_CLOUDFLARE_PROJECT_NAME: ${{ secrets.SPARKFLARE_CLOUDFLARE_PROJECT_NAME }}
+          SPARKFLARE_PACKAGE_MANAGER: pnpm

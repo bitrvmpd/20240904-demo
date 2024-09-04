@@ -7,11 +7,21 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "wrangler pages deploy ./dist --commit-dirty true --project-name $SPARKFLARE_CLOUDFLARE_PROJECT_NAME"
   },
   "dependencies": {
-    "astro": "^4.15.2",
     "@astrojs/check": "^0.9.3",
+    "astro": "^4.15.2",
     "typescript": "^5.5.4"
+  },
+  "packageManager": "pnpm@9.8.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9.8.0"
+  },
+  "devDependencies": {
+    "sparkflare": "0.0.4",
+    "wrangler": "^3.74.0"
   }
 }
